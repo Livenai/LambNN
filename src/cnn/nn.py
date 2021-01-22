@@ -10,7 +10,7 @@ Tensorflow Message Debug Level:<
     2 = INFO and WARNING messages are not printed
     3 = INFO, WARNING, and ERROR messages are not printed
 '''
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+#os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 print(fg(245))  # material innecesario en gris
 import numpy as np
 import cv2
@@ -78,6 +78,10 @@ class Model_constructor():
         print("#################################################################\n")
         print(self.B + "Usando Modelo " + self.C + str(self.ID_MODELO) + self.B, end='\n\n')
         return loadModels(self.ID_MODELO)
+
+
+    def load_model_from_path(self, model_path):
+        return keras.models.load_model(model_path)
 
 
     def compile_model(self, model, regression=False):
@@ -230,20 +234,20 @@ class Model_constructor():
 
         calls = []
         if regression:
-            calls.append(keras.callbacks.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=self.paciencia,
+            calls.append(keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=self.paciencia,
                                                     verbose=0,
                                                     mode='auto', baseline=None, restore_best_weights=True))
         else:
-            calls.append(keras.callbacks.callbacks.EarlyStopping(monitor='val_accuracy', min_delta=0.01, patience=self.paciencia,
+            calls.append(keras.callbacks.EarlyStopping(monitor='val_accuracy', min_delta=0.01, patience=self.paciencia,
                                                     verbose=0,
                                                     mode='auto', baseline=None, restore_best_weights=True))
 
         if color == -1:
-            calls.append(keras.callbacks.callbacks.LambdaCallback(on_epoch_begin=lambda e, l: print(fg(np.random.randint(130, 232))),
+            calls.append(keras.callbacks.LambdaCallback(on_epoch_begin=lambda e, l: print(fg(np.random.randint(130, 232))),
                                                      on_epoch_end=lambda e, l: print(fg(15)), on_batch_begin=None,
                                                      on_batch_end=None, on_train_begin=None, on_train_end=None))
         elif color >= 0 and color < 256:
-            calls.append(keras.callbacks.callbacks.LambdaCallback(on_epoch_begin=lambda e, l: print(fg(color)),
+            calls.append(keras.callbacks.LambdaCallback(on_epoch_begin=lambda e, l: print(fg(color)),
                                                      on_epoch_end=lambda e, l: print(fg(15)), on_batch_begin=None,
                                                      on_batch_end=None, on_train_begin=None, on_train_end=None))
 
@@ -546,8 +550,8 @@ class Model_constructor():
         if not quiet:
             print(self.B + "Cargando modelo:\n\n " + self.C + str(path) + self.B + "\n")
         return model
-    
-    
+
+
     def print_final_regress_evaluation(self, model, val_gen, num_examples=1):
         # Evaluacion final
         print("\n\nEvaluacion final:\n")
@@ -618,8 +622,3 @@ class Model_constructor():
 
 
         print()
-
-
-
-
-

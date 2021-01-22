@@ -123,9 +123,9 @@ Red 6:
         learning_rate = 0.00001
         datos normalizados [0,3000]
         (MUY estable, sin apenas overfitting)
-        
-        
-        
+
+
+
 Red 10:
     - Mejor red hasta ahora con un 95,5% de val_accuracy
 
@@ -141,13 +141,13 @@ Del modelo 12 en adelante los modelos son de regresion
 Red 12:
     - Entrada de (640, 480)
     - Regresion
-    - 4.894.773  parametros 
+    - 4.894.773  parametros
     - 100 val_loss: (en una epoca llega a 17, pero se estabiliza en 100)
         12 epochs
         batch_size = 1
         learning_rate = 0.00001
         datos normalizados [0,1000]
-        
+
 
 
 '''
@@ -448,7 +448,7 @@ def M6():
 
     model.add(layers.Conv2D(128, kernel_size=kernel_size_3, activation='relu'))
     model.add(layers.MaxPooling2D(pool_size=pool_size_2))
-     
+
     model.add(layers.Flatten())
     model.add(layers.Dense(500, activation='relu'))
     model.add(layers.Dropout(0.4))
@@ -780,7 +780,49 @@ def M14():
 
     return model
 
+
+###################################################################        ###################################################################
+###################################################################   15   ###################################################################
+###################################################################        ###################################################################
+
+def M15():
+    model = models.Sequential()
+
+
+    #VGG16 like
+
+    model.add(layers.Conv2D(64, kernel_size=kernel_size_3,input_shape=(480, 640, 1) , activation='relu'))
+    model.add(layers.AveragePooling2D(pool_size=pool_size_2))
+    model.add(layers.BatchNormalization())
+
+    model.add(layers.Conv2D(64, kernel_size=kernel_size_3, activation='relu'))
+    model.add(layers.AveragePooling2D(pool_size=pool_size_2))
+    model.add(layers.BatchNormalization())
+
+    model.add(layers.Conv2D(64, kernel_size=kernel_size_3, activation='relu'))
+    model.add(layers.AveragePooling2D(pool_size=pool_size_2))
+    model.add(layers.BatchNormalization())
+
+    model.add(layers.Conv2D(64, kernel_size=kernel_size_5, activation='relu'))
+    model.add(layers.AveragePooling2D(pool_size=pool_size_2))
+    model.add(layers.BatchNormalization())
+
+    model.add(layers.Conv2D(128, kernel_size=kernel_size_5, activation='relu'))
+    model.add(layers.MaxPooling2D(pool_size=pool_size_2))
+
+    model.add(layers.Flatten())
+
+    model.add(layers.Dense(200, activation='relu'))
+    model.add(layers.Dropout(0.5))
+    model.add(layers.Dense(30, activation='relu'))
+    model.add(layers.Dropout(0.5))
+    model.add(layers.Dense(2, activation='softmax'))
+
+    return model
+
+
+
 ############################################################   lista de modelos   ############################################################
 
 
-listaFunciones = [M0,M1,M2,M3,M4,M5,M6,M7,M8,M9,M10,M11,M12,M13,M14]
+listaFunciones = [M0,M1,M2,M3,M4,M5,M6,M7,M8,M9,M10,M11,M12,M13,M14,M15]

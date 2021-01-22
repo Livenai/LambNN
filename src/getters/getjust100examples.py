@@ -12,10 +12,12 @@ parent_folder = os.path.abspath(
 
 dataset_dest_folder = os.path.join(parent_folder, "dataset")
 raw_dataset_path = os.path.join(parent_folder, "dataset", "fase2raw")
-dest_path = os.path.join(dataset_dest_folder, "lambnnFase2CUS")
+dest_path = os.path.join(dataset_dest_folder, "examples")
 
 # -------------  PARAMETROS  ------------
 OVERRIDE_MAXVALUE = 3000  # -1 = auto detect
+
+num_examples = 100
 
 
 
@@ -23,6 +25,7 @@ OVERRIDE_MAXVALUE = 3000  # -1 = auto detect
 
 
 num_images = 0
+ALLJSON = []
 
 # contamos las imagenes totales
 for json_number, json_name in enumerate(glob.glob(os.path.join(raw_dataset_path, '*.json'))):
@@ -34,6 +37,7 @@ for json_number, json_name in enumerate(glob.glob(os.path.join(raw_dataset_path,
     for key in j:
         num_images = num_images + 1
         i += 1
+        ALLJSON.append(j[key])
     print("Numero del Json: " + V + str(json_number) + B)
     print("Imagenes en el Json: " + V + str(i) + B, end='\n\n')
 
@@ -42,12 +46,48 @@ for json_number, json_name in enumerate(glob.glob(os.path.join(raw_dataset_path,
 print(attr(4) + "Imagenes Totales:" + attr(0) + " " + V + str(num_images) + B, end='\n\n')
 
 
-
-i2 = 0
-label_list = []
-num_lamb = 0
 num_fail = 0
+num_done = 0
 
+
+# Hacemos shuffle a ALLJSON para randomizar las imagenes
+ALLJSON = np.array(ALLJSON)
+np.random.shuffle(ALLJSON)
+
+# Cogemos las primeras num_examples y las guardamos modificadas en la carpeta destino
+for filenumber, example in enumerate(ALLJSON, 0): 
+	# cargamos cada imagen
+	lastSlash = example["path_depth_top_image"].rfind("/")
+	justName  = example["path_depth_top_image"][lastSlash+1:]
+
+	img_path_and_name = os.path.join(raw_dataset_path, justName)
+	img = cv2.imread(img_path_and_name, flags=cv2.IMREAD_ANYDEPTH)
+
+	# comprobamos si la imagen existe y ha sido cargada correctamente (si no, saltamos a la siguiente)
+	try:
+		if len(img) == 0:
+			print("[!] Error al cargar la imagen: " + V + str(img_path_and_name) + B)
+			exit()
+	except:
+		num_fail += 1
+		continue  
+
+	img = img * 30
+
+	# obtenemos el peso
+	peso = example["weight"]
+
+	# Guardamos la imagen en la nueva carpeta con el nombre del numero mas el peso
+	if not os.path.exists(dest_path):
+		os.makedirs(dest_path)
+	cv2.imwrite(os.path.join(dest_path, str(filenumber) + "__" + str(peso) + "Kg.png"), np.uint16(img))
+	num_done += 1
+	if num_done >= num_examples:
+		break
+
+print("errores: ", num_fail)
+
+'''
 # para todos los .json del raw_dataset
 for json_number, json_name in enumerate(glob.glob(os.path.join(raw_dataset_path, '*.json'))):
 
@@ -60,8 +100,12 @@ for json_number, json_name in enumerate(glob.glob(os.path.join(raw_dataset_path,
 
         if j[key]["label"] == "lamb":
             # cargamos cada imagen
-            img_path_and_name = os.path.join(raw_dataset_path, j[key]["path_depth_top_image"].replace("/", ".")[1:])
+            lastSlash = j[key]["path_depth_top_image"].rfind("/")
+            justName = j[key]["path_depth_top_image"][lastSlash+1:]
+
+            img_path_and_name = os.path.join(raw_dataset_path, justName)
             img = cv2.imread(img_path_and_name, flags=cv2.IMREAD_ANYDEPTH)
+
 
             # comprobamos si la imagen existe y ha sido cargada correctamente (si no, saltamos a la siguiente)
             try:
@@ -112,3 +156,4 @@ d.close()
 
 print("\n\nEl dataset resultado se compone de " + V + str(num_lamb) + B + " imagenes.\n\n")
 print(str(num_fail) + " imagenes erradas o no encontradas.")
+'''

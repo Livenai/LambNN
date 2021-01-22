@@ -9,8 +9,8 @@ AZUL   = fg(45)
 AZUL_CLARO = fg(159)
 
 
-nombre_dataset = "lambsmCUS"
-target_size = (230, 510, 1)
+nombre_dataset = "clasiLamb_2-1_CUS"
+target_size = (480, 640, 1)
 
 
 
@@ -19,9 +19,13 @@ parent_folder = os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(
 ################################################       PARAMETROS       ################################################
 
 
-ID_MODELO = 11
+ID_MODELO = 15
 
-epochs = 5
+# Path al modelo para cargar y reciclar
+# "" para crear modelo nuevo
+model_path = ""
+
+epochs = 100
 batch_size = 1  # 1
 
 loading_batch_size = 1
@@ -60,9 +64,13 @@ colores["default"] = BLANCO
 
 ##################################################        MAIN        ##################################################
 
-# creamos el modelo
+# creamos el modelo (o lo cargamos si se aporta un path)
 MC = Model_constructor(parent_folder, parametros, colores)
-model = MC.create_model()
+if model_path == "":
+    model = MC.create_model()
+else:
+    model = MC.load_model_from_path(model_path)
+
 
 print(colores["main"])
 model.summary()
@@ -70,8 +78,10 @@ print(colores["default"])
 print("#################################################################")
 
 
-# compilamos
-model = MC.compile_model(model)
+# compilamos (si el modelo es nuevo)
+if model_path == "":
+    model = MC.compile_model(model)
+
 
 
 # obtenemos los generadores
@@ -86,8 +96,8 @@ history, model = MC.fit_model(model, genetators, use_generators=True, regression
 MC.print_final_classif_evaluation(model, genetators[1], target_size=target_size, num_examples=100)
 
 # mostramos los resultados
-MC.show_plot(history, regression=False, just_save=True, save_name='lambSM_2')
-MC.save_model(model, "SM2")
+MC.show_plot(history, regression=False, just_save=True, save_name='ClasiLamb_2-1')
+MC.save_model(model, "CL2-1")
 
 
 
